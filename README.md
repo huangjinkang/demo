@@ -13,4 +13,4 @@
 #### 2. <a name="api">APIs</a>
 - `GET` `/api/v1/articles` # Get articles list
 - `POST` `/api/v1/article` # Add new article
-- `PUT` `/api/v1/articles/{article_id}` # Update article
+- `PUT` `/api/v1/article/{article_id}` # Update article

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"demo/src/dtos"
+	"demo/src/errs"
 	"demo/src/models"
 	"demo/src/repositories"
 	"errors"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"log"
+	"sync"
 )
 
 const maxSummaryLength = 200 // 文章摘要字符
@@ -134,16 +136,51 @@ func (s *ArticleService) UpdateArticle(ctx context.Context, articleID uint64, ar
 		Content:   articleReq.Content,
 	}
 
+	// 使用WaitGroup等待两个异步更新操作
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	// 错误通道用于从goroutines接收错误
+	errChan := make(chan errs.UpdateError, 2)
+
 	// 更新DB文章内容
-	if err := s.mysqlRepo.UpdateArticle(&article, &articleContent); err != nil {
-		return err
-	}
+	go func() {
+		defer wg.Done()
+		if err := s.mysqlRepo.UpdateArticle(&article, &articleContent); err != nil {
+			errChan <- errs.NewUpdateError(errs.DB, err)
+		}
+	}()
 
 	// 更新ES文章内容
-	if err := s.elasticsearchRepo.UpdateArticle(ctx, &article); err != nil {
-		log.Printf("Failed to update ES index for article ID %d: %v", articleID, err)
-		// TODO：需要回滚数据库更改或进行其它错误处理
-		return err
+	go func() {
+		defer wg.Done()
+		if err := s.elasticsearchRepo.UpdateArticle(ctx, &article); err != nil {
+			errChan <- errs.NewUpdateError(errs.ES, err)
+		}
+	}()
+
+	// 等待所有goroutine完成
+	wg.Wait()
+
+	// 关闭错误通道
+	close(errChan)
+
+	// 检查错误通道
+	var updateErr error
+	for e := range errChan {
+		if e.Err != nil {
+			if e.Source == errs.DB {
+				// 处理数据库更新错误
+			} else if e.Source == errs.ES {
+				// 处理ES更新错误
+			}
+			log.Printf("An error occurred while updating the article! ID: %d, Source: %s, Error: %v", articleID, e.Source, e.Err)
+			updateErr = e.Err
+		}
+	}
+
+	if updateErr != nil {
+		return updateErr
 	}
 
 	return nil

@@ -236,7 +236,6 @@ func (repo *ElasticsearchRepository) UpdateArticle(ctx context.Context, article 
 
 	// 发送请求
 	res, err := req.Do(ctx, repo.client)
-	fmt.Println("res:", res)
 	if err != nil {
 		return err
 	}
