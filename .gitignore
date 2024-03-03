@@ -1,0 +1,75 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+
+# Project-local vendor directory
+vendor/
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+# Folders to ignore
+bin/
+dist/
+tmp/
+
+# Logs
+*.log
+*.sql
+*.sqlite
+
+# OS generated files
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Ignore the config file containing sensitive information
+config.yaml
+secret.yaml
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Test binary, built with go test -c
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Private application and IDE specific files
+**/config/development.json
+**/config/testing.json
+**/config/production.json
+
+# Ignore local .env files
+.env
+.env.local
+.env.*.local
+
+# Ignore generated files from migrations
+**/migrations/*.go
+!**/migrations/*.tmpl
+
