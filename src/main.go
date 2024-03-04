@@ -37,8 +37,13 @@ func main() {
 	// 使用router.go中的SetupRouter函数设置Gin路由
 	router := SetupRouter(articleService)
 
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "5001" // 默认服务端口号
+	}
+
 	// 启动服务器
-	err = router.Run(":5001")
+	err = router.Run(":" + port)
 	if err != nil {
 		log.Fatalf("Failed to run server: %v\n", err)
 	}
