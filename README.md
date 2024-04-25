@@ -3,7 +3,7 @@
 #### Menu
 1. [Config](#cfg)
 2. [Run](#run)
-2. 3[APIs](#api)
+3. [APIs](#api)
 
 ---
 
